@@ -1,4 +1,6 @@
-import Swal, { SweetAlertIcon } from "sweetalert2";
+import { toast } from "react-hot-toast";
+import type { SweetAlertIcon } from "sweetalert2";
+import Swal from "sweetalert2";
 
 // Verifica si un valor es un objeto
 export const isObject = (obj: unknown): obj is Record<string, unknown> =>
@@ -23,21 +25,32 @@ export const showWindowAlert = ({
   loader = false,
   timeout = 0,
 }: ShowWindowAlertProps): void => {
-  Swal.fire({
-    title,
-    icon: icon || undefined,
-    text: text || message,
-    buttonsStyling: false,
-    customClass: {
-      popup: "rounded-lg shadow-lg p-6",
-      confirmButton:
-        "bg-gray-300 hover:bg-gray-300/80 text-gray-800 py-2 px-8 rounded font-semibold focus:outline-none uppercase text-sm",
-    },
-    timer: timeout,
-    timerProgressBar: Boolean(timeout),
-    didOpen: () => {
-      loader ? Swal.showLoading() : Swal.hideLoading();
-    },
+  removeAllWindows(); // Cierra cualquier alerta previa
+  // remove all toasts
+  toast.dismiss();
+  let iconEmoji = "";
+  let toastFn: any = toast;
+  switch (icon) {
+    case "success": {
+      toastFn = toast.success;
+      break;
+    }
+    case "error": {
+      toastFn = toast.error;
+      break;
+    }
+  }
+  if (loader) {
+    toastFn = toast.loading;
+  }
+
+  const toastText = `${iconEmoji} ${title ? title + ": " : ""}${
+    text || message
+  }`;
+  toastFn(toastText, {
+    duration: timeout > 0 ? timeout : 4000,
+    className:
+      "rounded-lg shadow-lg p-4 bg-white dark:bg-slate-900 text-gray-800 dark:text-slate-100 font-medium text-sm",
   });
 };
 

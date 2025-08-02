@@ -7,10 +7,8 @@ import {
   Trash2,
   Save,
   X,
-  Palette,
   FileText,
-  Bell,
-  EyeOff,
+  MessageCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -25,17 +23,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { COLORS } from "@/lib/constants/colors";
-import { Alert, PedidoUnificado } from "@/lib/interfaces/order";
+import { Note, PedidoUnificado } from "@/lib/interfaces/order";
 import { formatDate, showWindowAlert } from "@/lib/utils/general";
-import { Colors } from "@/lib/enum/colors";
-import { addAlert, changeAlert } from "@/lib/utils/firebase";
+import { addNote, changeNote, changeNotes } from "@/lib/utils/firebase";
 import ConfirmDialog from "../general/ConfirmDialog";
 
-export default function AlertGenerator({ order }: { order: PedidoUnificado }) {
+export default function NoteGenerator({ order }: { order: PedidoUnificado }) {
   const [text, setText] = useState("");
-  const [selectedColor, setSelectedColor] = useState<Colors | null>(null);
-  const [alerts, setAlerts] = useState<Alert[]>(order.alertas || []);
+  const [notes, setNotes] = useState<Note[]>(order.notas || []);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tabValue, setTabValue] = useState("create");
 
@@ -43,74 +38,75 @@ export default function AlertGenerator({ order }: { order: PedidoUnificado }) {
     setTabValue(value);
   };
 
-  // Importar funciones de firebase
-
-  // Crear alerta
-  const handleCreateAlert = async () => {
-    if (!text.trim() || !selectedColor) return;
-    const newAlert: Alert = {
+  // Crear nota
+  const handleCreateNote = async () => {
+    if (!text.trim()) return;
+    const newNote: Note = {
       id: Math.random().toString(36).slice(2),
       text,
-      color: selectedColor,
       createdAt: new Date(),
     };
     showWindowAlert({
       loader: true,
-      title: "Creando alerta",
+      title: "Creando nota",
       timeout: 0,
     });
-    const success = await addAlert(order.id, newAlert);
+    const success = await addNote(order.id, newNote);
     if (success) {
-      setAlerts((prev) => [...prev, newAlert]);
+      setNotes((prev) => [...prev, newNote]);
       setText("");
-      setSelectedColor(null);
     }
   };
 
-  // Editar alerta
-  const handleEditAlert = async () => {
-    if (!editingId || !text.trim() || !selectedColor) return;
-    const updatedAlerts = alerts.map((a) =>
-      a.id === editingId ? { ...a, text, color: selectedColor } : a
-    );
+  // Editar nota
+  const handleEditNote = async () => {
+    if (!editingId || !text.trim()) return;
+    const noteToUpdate = notes.find((n) => n.id === editingId);
+    if (!noteToUpdate) return;
+
+    const updatedNote: Note = {
+      ...noteToUpdate,
+      text,
+    };
+
     showWindowAlert({
       loader: true,
-      title: "Actualizando alerta",
+      title: "Actualizando nota",
       timeout: 0,
     });
-    const success = await changeAlert(order.id, updatedAlerts);
+    const success = await changeNote(order.id, updatedNote);
     if (success) {
-      setAlerts(updatedAlerts);
+      setNotes((prev) =>
+        prev.map((n) => (n.id === editingId ? updatedNote : n))
+      );
       setEditingId(null);
       setText("");
-      setSelectedColor(null);
     }
   };
 
-  // Eliminar alerta
-  const handleDeleteAlert = async (id: string) => {
+  // Eliminar nota
+  const handleDeleteNote = async (id: string) => {
     try {
       if (!id) return;
       showWindowAlert({
-        title: "Eliminando alerta",
+        title: "Eliminando nota",
         loader: true,
         timeout: 0,
       });
-      const updatedAlerts = alerts.filter((a) => a.id !== id);
-      const success = await changeAlert(order.id, updatedAlerts);
+      const updatedNotes = notes.filter((n) => n.id !== id);
+      const success = await changeNotes(order.id, updatedNotes);
 
       if (success) {
-        setAlerts(updatedAlerts);
+        setNotes(updatedNotes);
         if (editingId === id) {
           setEditingId(null);
           setText("");
-          setSelectedColor(null);
         }
       }
     } catch (error) {
       showWindowAlert({
         title: "Error",
-        message: "Error al eliminar la alerta",
+        message: "Error al eliminar la nota",
         icon: "error",
         timeout: 2000,
       });
@@ -118,17 +114,15 @@ export default function AlertGenerator({ order }: { order: PedidoUnificado }) {
   };
 
   // Iniciar edición
-  const startEdit = (alert: Alert) => {
-    setEditingId(alert.id);
-    setText(alert.text);
-    setSelectedColor(alert.color);
+  const startEdit = (note: Note) => {
+    setEditingId(note.id);
+    setText(note.text);
   };
 
   // Cancelar edición
   const cancelEdit = () => {
     setEditingId(null);
     setText("");
-    setSelectedColor(null);
   };
 
   useEffect(() => {
@@ -159,17 +153,16 @@ export default function AlertGenerator({ order }: { order: PedidoUnificado }) {
               }}
               className="flex items-center gap-2"
             >
-              <Bell className="h-4 w-4" />
-              Activas ({alerts.length})
+              <MessageCircle className="h-4 w-4" />
+              Activas ({notes.length})
             </TabsTrigger>
           </TabsList>
 
-          {/* Tab: Crear Alerta */}
+          {/* Tab: Crear Nota */}
           <TabsContent value="create">
             <div className="grid grid-cols-1 gap-6 !h-[70vh] overflow-auto">
-              {/* Columna Izquierda - Controles */}
-              <div className="lg:col-span-1 space-y-6 flex flex-col justify-center">
-                {/* Formulario de Creación/Edición */}
+              {/* Formulario de Creación/Edición */}
+              <div className="lg:col-span-1 space-y-6 flex flex-col justify-start">
                 <Card className="shadow-lg border bg-card">
                   <CardContent className="space-y-6">
                     {/* Campo de Texto */}
@@ -179,71 +172,31 @@ export default function AlertGenerator({ order }: { order: PedidoUnificado }) {
                         className="text-sm font-medium flex items-center gap-2"
                       >
                         <FileText className="h-4 w-4" />
-                        Contenido de la alerta
+                        Contenido de la nota
                       </Label>
                       <Textarea
                         id="note-text"
                         value={text}
                         onChange={(e) => setText(e.target.value)}
-                        placeholder="Escribe el contenido de tu alerta aquí..."
-                        className="min-h-[100px] resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        maxLength={200}
+                        placeholder="Escribe el contenido de tu nota aquí..."
+                        className="min-h-[150px] resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        maxLength={500}
                       />
                       <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>Máximo 200 caracteres</span>
-                        <span>{text.length}/200</span>
+                        <span>Máximo 500 caracteres</span>
+                        <span>{text.length}/500</span>
                       </div>
-                    </div>
-
-                    {/* Selector de Color */}
-                    <div className="space-y-3">
-                      <Label className="text-sm font-medium flex items-center gap-2">
-                        <Palette className="h-4 w-4" />
-                        Color de la alerta
-                      </Label>
-                      <div className="grid grid-cols-5 gap-3">
-                        {Object.values(COLORS).map((option) => (
-                          <button
-                            key={option.value}
-                            onClick={() => setSelectedColor(option.name)}
-                            className={`
-                              relative w-12 h-12 rounded-xl transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400
-                              ${option.value}
-                              ${
-                                selectedColor === option.name
-                                  ? "ring-2 ring-offset-2 ring-foreground scale-110"
-                                  : "hover:ring-2 hover:ring-offset-1 hover:ring-muted-foreground"
-                              }
-                            `}
-                            title={option.name}
-                          >
-                            {selectedColor === option.name && (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-3 h-3 bg-white rounded-full shadow-sm" />
-                              </div>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                      {selectedColor && (
-                        <Badge variant="secondary" className="w-fit">
-                          Color seleccionado:{" "}
-                          {COLORS[selectedColor as Colors].name}
-                        </Badge>
-                      )}
                     </div>
 
                     {/* Botones de Acción */}
                     <div className="flex gap-3 pt-4">
                       <Button
-                        disabled={!text.trim() || !selectedColor}
-                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                        onClick={
-                          editingId ? handleEditAlert : handleCreateAlert
-                        }
+                        disabled={!text.trim()}
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                        onClick={editingId ? handleEditNote : handleCreateNote}
                       >
                         <Save className="h-4 w-4 mr-2" />
-                        {editingId ? "Actualizar" : "Crear Alerta"}
+                        {editingId ? "Actualizar" : "Crear Nota"}
                       </Button>
                       {editingId && (
                         <Button
@@ -261,40 +214,40 @@ export default function AlertGenerator({ order }: { order: PedidoUnificado }) {
             </div>
           </TabsContent>
 
-          {/* Tab: Alertas Activas */}
+          {/* Tab: Notas Activas */}
           <TabsContent value="active">
             <Card className="shadow-lg border bg-card !h-[70vh] overflow-auto">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Bell className="h-5 w-5 text-green-600" />
-                  Alertas Activas
+                  <MessageCircle className="h-5 w-5 text-blue-600" />
+                  Notas Activas
                   <Badge variant="secondary" className="ml-auto">
-                    {alerts.length}
+                    {notes.length}
                   </Badge>
                 </CardTitle>
                 <CardDescription>
-                  Alertas que están actualmente visibles y activas
+                  Notas que están actualmente guardadas para este pedido
                 </CardDescription>
               </CardHeader>
               <CardContent className="max-h-96 overflow-y-auto">
-                {alerts.length === 0 ? (
+                {notes.length === 0 ? (
                   <div className="text-center py-12">
-                    <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                    <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
                     <h3 className="text-lg font-medium text-foreground mb-2">
-                      No hay alertas activas
+                      No hay notas activas
                     </h3>
                     <p className="text-muted-foreground mb-6">
-                      Crea tu primera alerta en la pestaña "Crear"
+                      Crea tu primera nota en la pestaña "Crear"
                     </p>
                   </div>
                 ) : (
                   <div className="pr-2 flex flex-col gap-1">
-                    {alerts.map((note, index) => (
+                    {notes.map((note, index) => (
                       <div key={note.id}>
                         <div
                           className={`
-                          relative p-3 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md m-3
-                          ${note.color} ${COLORS[note.color].value}
+                          relative p-4 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md m-3
+                          bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700
                           ${
                             editingId === note.id
                               ? "ring-2 ring-amber-400 ring-offset-2"
@@ -304,10 +257,10 @@ export default function AlertGenerator({ order }: { order: PedidoUnificado }) {
                         >
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex-1 min-w-0">
-                              <p className="text-base font-medium leading-relaxed break-words">
+                              <p className="text-base font-medium leading-relaxed break-words text-gray-800 dark:text-slate-200">
                                 {note.text}
                               </p>
-                              <div className="mt-3 flex items-center gap-4 text-xs opacity-90">
+                              <div className="mt-3 flex items-center gap-4 text-xs text-gray-500 dark:text-slate-400">
                                 <span>
                                   Creada: {formatDate(note.createdAt)}
                                 </span>
@@ -318,27 +271,27 @@ export default function AlertGenerator({ order }: { order: PedidoUnificado }) {
                               <Button
                                 size="sm"
                                 variant="secondary"
-                                className="h-8 w-8 p-0 bg-white/20 hover:bg-white/30 border-0"
-                                title="Editar alerta"
+                                className="h-8 w-8 p-0 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 border-0"
+                                title="Editar nota"
                                 onClick={() => startEdit(note)}
                               >
-                                <Edit3 className="h-3.5 w-3.5" />
+                                <Edit3 className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
                               </Button>
 
                               <ConfirmDialog
-                                title="Eliminar alerta"
-                                description="¿Estás seguro de que deseas eliminar esta alerta?"
+                                title="Eliminar nota"
+                                description="¿Estás seguro de que deseas eliminar esta nota?"
                                 confirmText="Eliminar"
                                 cancelText="Cancelar"
-                                onConfirm={() => handleDeleteAlert(note.id)}
+                                onConfirm={() => handleDeleteNote(note.id)}
                               >
                                 <Button
                                   size="sm"
                                   variant="secondary"
-                                  className="h-8 w-8 p-0 bg-white/20 hover:bg-white/30 border-0"
-                                  title="Eliminar alerta"
+                                  className="h-8 w-8 p-0 bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800 border-0"
+                                  title="Eliminar nota"
                                 >
-                                  <Trash2 className="h-3.5 w-3.5" />
+                                  <Trash2 className="h-3.5 w-3.5 text-red-600 dark:text-red-400" />
                                 </Button>
                               </ConfirmDialog>
                             </div>
@@ -353,7 +306,7 @@ export default function AlertGenerator({ order }: { order: PedidoUnificado }) {
                           )}
                         </div>
 
-                        {index < alerts.length - 1 && (
+                        {index < notes.length - 1 && (
                           <Separator className="my-4" />
                         )}
                       </div>

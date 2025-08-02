@@ -2,7 +2,7 @@ import { doc, getDoc, Timestamp, updateDoc } from "firebase/firestore";
 import { showWindowAlert } from "./general";
 import { PRODUCT_STATE } from "../constants";
 import { db } from "../firebase/firebase";
-import { Alert } from "../interfaces/order";
+import { Alert, Note } from "../interfaces/order";
 import { COLLECTIONS } from "../constants/db";
 
 export const changeState = async (
@@ -114,7 +114,142 @@ export const addAlert = async (
   } catch (err: unknown) {
     showWindowAlert({
       title: "Error",
+      message: "Error al añadir alerta",
+      icon: "error",
+      timeout: 2000,
+    });
+    return false;
+  }
+};
+
+export const addNote = async (
+  id: string | undefined,
+  note: Note
+): Promise<boolean> => {
+  try {
+    if (!id || !note) {
+      showWindowAlert({
+        title: "Error",
+        message: "Ocurrió un error al generar la alerta",
+        icon: "error",
+        timeout: 2000,
+      });
+      return false;
+    }
+
+    // Consultar el documento actual
+    const docRef = doc(db, COLLECTIONS.PEDIDOS_ESTADO, id);
+    const docSnap = await getDoc(docRef);
+    let notas: Note[] = [];
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      notas = Array.isArray(data.notas) ? data.notas : [];
+    }
+    // Agregar la nueva nota
+    const newNotas = [
+      ...notas,
+      {
+        ...note,
+        createdAt: Timestamp.fromDate(note.createdAt),
+      },
+    ];
+    await updateDoc(docRef, { notas: newNotas });
+
+    showWindowAlert({
+      title: "Nota añadida correctamente",
+      icon: "success",
+      timeout: 2000,
+    });
+    return true;
+  } catch (err: unknown) {
+    showWindowAlert({
+      title: "Error",
       message: "Error al añadir nota",
+      icon: "error",
+      timeout: 2000,
+    });
+    return false;
+  }
+};
+export const changeNote = async (
+  id: string | undefined,
+  note: Note
+): Promise<boolean> => {
+  try {
+    if (!id || !note) {
+      showWindowAlert({
+        title: "Error",
+        message: "Ocurrió un error al modificar la nota",
+        icon: "error",
+        timeout: 2000,
+      });
+      return false;
+    }
+
+    // Consultar el documento actual
+    const docRef = doc(db, COLLECTIONS.PEDIDOS_ESTADO, id);
+    const docSnap = await getDoc(docRef);
+    let notas: Note[] = [];
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      notas = Array.isArray(data.notas) ? data.notas : [];
+    }
+
+    // Modificar la nota
+    const newNotas = notas.map((n) => (n.id === note.id ? note : n));
+    await updateDoc(docRef, { notas: newNotas });
+
+    showWindowAlert({
+      title: "Nota modificada correctamente",
+      icon: "success",
+      timeout: 2000,
+    });
+    return true;
+  } catch (err: unknown) {
+    showWindowAlert({
+      title: "Error",
+      message: "Error al modificar nota",
+      icon: "error",
+      timeout: 2000,
+    });
+    return false;
+  }
+};
+
+export const changeNotes = async (
+  id: string | undefined,
+  notas: Note[]
+): Promise<boolean> => {
+  try {
+    if (!id || !notas) {
+      showWindowAlert({
+        title: "Error",
+        message: "Ocurrió un error al modificar las notas",
+        icon: "error",
+        timeout: 2000,
+      });
+      return false;
+    }
+
+    await updateDoc(doc(db, COLLECTIONS.PEDIDOS_ESTADO, id), {
+      notas: notas.map((note) => ({
+        ...note,
+        createdAt:
+          note.createdAt instanceof Date
+            ? Timestamp.fromDate(note.createdAt)
+            : note.createdAt,
+      })),
+    });
+    showWindowAlert({
+      title: "Notas modificadas correctamente",
+      icon: "success",
+      timeout: 2000,
+    });
+    return true;
+  } catch (err: unknown) {
+    showWindowAlert({
+      title: "Error",
+      message: "Error al modificar notas",
       icon: "error",
       timeout: 2000,
     });
