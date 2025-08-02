@@ -27,7 +27,7 @@ import {
 import { PRODUCT_STATE, statusColors } from "@/lib/constants";
 import { removeAllWindows, showWindowAlert } from "@/lib/utils/general";
 import { changeState } from "@/lib/utils/firebase";
-import NoteGenerator from "./noteGenerator";
+import NoteGenerator from "./alertGenerator";
 import { PedidoUnificado } from "@/lib/interfaces/order";
 
 interface OrderRowProps {
@@ -81,23 +81,27 @@ export function OrderRow({ order }: OrderRowProps) {
   }));
 
   return (
-    <div className="group bg-white rounded-xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 flex flex-wrap md:flex-nowrap md:items-center md:justify-between gap-4 relative">
+    <div className="group bg-white dark:bg-slate-900 rounded-xl p-4 border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all duration-200 flex flex-wrap md:flex-nowrap md:items-center md:justify-between gap-4 relative">
       {/* Producto y cliente */}
       <div className="flex items-center gap-4 flex-1 min-w-full md:min-w-0">
         <div className="truncate">
-          <h3 className="font-semibold text-gray-800 truncate pr-6 md:pr-0">
+          <h3 className="font-semibold text-gray-800 dark:text-slate-200 truncate pr-6 md:pr-0">
             {productos[0].titulo} (x{productos[0].cantidad})
           </h3>
-          <p className="text-sm text-gray-500">{cliente.nombre}</p>
+          <p className="text-sm text-gray-500 dark:text-slate-400">
+            {cliente.nombre}
+          </p>
         </div>
       </div>
 
       {/* Envío */}
       <div className="flex items-center gap-3 min-w-[160px]">
-        <Truck className="h-5 w-5 text-gray-400" />
+        <Truck className="h-5 w-5 text-gray-400 dark:text-slate-500" />
         <div>
-          <p className="text-sm text-gray-600 font-medium">Tipo de envío</p>
-          <p className="text-sm text-gray-800 capitalize max-w-24">
+          <p className="text-sm text-gray-600 dark:text-slate-400 font-medium">
+            Tipo de envío
+          </p>
+          <p className="text-sm text-gray-800 dark:text-slate-200 capitalize max-w-24">
             {envio?.tipo || "Acordar con el cliente"}
           </p>
         </div>
@@ -128,12 +132,14 @@ export function OrderRow({ order }: OrderRowProps) {
 
       {/* Fecha */}
       <div className="flex items-center gap-3 min-w-[200px]">
-        <CalendarDays className="h-5 w-5 text-gray-400" />
+        <CalendarDays className="h-5 w-5 text-gray-400 dark:text-slate-500" />
         <div>
-          <p className="text-sm text-gray-600 font-medium">
+          <p className="text-sm text-gray-600 dark:text-slate-400 font-medium">
             Última actualización
           </p>
-          <p className="text-sm text-gray-800 max-w-24">{formattedDate} hs</p>
+          <p className="text-sm text-gray-800 dark:text-slate-200 max-w-24">
+            {formattedDate} hs
+          </p>
         </div>
       </div>
 
@@ -142,7 +148,7 @@ export function OrderRow({ order }: OrderRowProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">
-              <EllipsisVertical className="h-5 w-5 text-gray-600" />
+              <EllipsisVertical className="h-5 w-5 text-gray-600 dark:text-slate-400" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -158,11 +164,11 @@ export function OrderRow({ order }: OrderRowProps) {
 
       {/* Modal para alerta */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent>
-          <DialogHeader>
+        <DialogContent className="max-w-7xl !p-0">
+          <DialogHeader className="px-6 pt-6">
             <DialogTitle>Agregar alerta</DialogTitle>
           </DialogHeader>
-          <NoteGenerator />
+          <NoteGenerator order={order} />
         </DialogContent>
       </Dialog>
     </div>

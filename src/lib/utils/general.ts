@@ -19,13 +19,13 @@ export const showWindowAlert = ({
   title = "",
   text = "",
   message = "",
-  icon = "error",
+  icon,
   loader = false,
   timeout = 0,
 }: ShowWindowAlertProps): void => {
   Swal.fire({
     title,
-    icon,
+    icon: icon || undefined,
     text: text || message,
     buttonsStyling: false,
     customClass: {
@@ -52,6 +52,7 @@ interface ShowWindowOptionsAlertProps {
   customClassCancelButton?: string;
   customClassTitle?: string;
   onConfirm?: () => void;
+  onCancel?: () => void;
 }
 
 // Alerta con opciones (confirmar / cancelar)
@@ -65,6 +66,7 @@ export const showWindowOptionsAlert = ({
   customClassCancelButton = "",
   customClassTitle = "",
   onConfirm = () => {},
+  onCancel = () => {},
 }: ShowWindowOptionsAlertProps): void => {
   Swal.fire({
     title,
@@ -75,17 +77,26 @@ export const showWindowOptionsAlert = ({
     cancelButtonText,
     buttonsStyling: false,
     customClass: {
-      popup: "rounded-lg shadow-lg p-6",
+      container: "!z-[1000]",
+      htmlContainer: "!z-[1000]",
+      popup: "rounded-lg shadow-lg p-6 !z-[100000]",
       title: `${customClassTitle} text-lg font-bold text-gray-800`,
       confirmButton: `${customClassConfirmButton} bg-red-500 !m-4 hover:bg-red-600/80 text-white font-semibold transition py-2 px-4 rounded focus:outline-none uppercase text-sm`,
       cancelButton: `${customClassCancelButton} bg-gray-300/70 hover:bg-gray-300 text-gray-800 transition font-semibold py-2 px-4 rounded focus:outline-none uppercase text-sm`,
     },
+
     didOpen: () => {
       Swal.hideLoading();
+      const popup = document.querySelector(".swal2-popup");
+      if (popup) {
+        (popup as HTMLElement).style.zIndex = "1000000"; // más alto que cualquier modal de ShadCN
+      }
     },
   }).then((result: any) => {
     if (result.isConfirmed) {
       onConfirm();
+    } else {
+      onCancel();
     }
   });
 };
@@ -93,4 +104,15 @@ export const showWindowOptionsAlert = ({
 // Cerrar todas las alertas
 export const removeAllWindows = (): void => {
   Swal.close();
+};
+
+export const formatDate = (date: Date | string): string => {
+  const d = new Date(date);
+  return d.toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 };

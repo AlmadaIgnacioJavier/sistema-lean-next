@@ -15,6 +15,7 @@ import {
 import { showWindowAlert } from "@/lib/utils/general";
 import { PedidoUnificado } from "@/lib/interfaces/order";
 import { db } from "@/lib/firebase/firebase";
+import { COLLECTIONS } from "@/lib/constants/db";
 
 interface UseAsksProps {
   limitQuantity?: number;
@@ -34,7 +35,7 @@ export function useAsks({ limitQuantity = 10 }: UseAsksProps = {}) {
     setLoading(true);
 
     const pedidosEstadoQuery = query(
-      collection(db, "pedidos_estado"),
+      collection(db, COLLECTIONS.PEDIDOS_ESTADO),
       orderBy("date", "desc"),
       limit(quantity)
     );
@@ -57,7 +58,7 @@ export function useAsks({ limitQuantity = 10 }: UseAsksProps = {}) {
         }
 
         const pedidosQuery = query(
-          collection(db, "pedidos"),
+          collection(db, COLLECTIONS.PEDIDOS),
           where(documentId(), "in", pedidosIds)
         );
         const pedidosSnapshot = await getDocs(pedidosQuery);
@@ -71,10 +72,18 @@ export function useAsks({ limitQuantity = 10 }: UseAsksProps = {}) {
               ? pedidoData.date.toDate()
               : pedidoData.date;
 
+          const alerts = estadoData[doc.id]?.alertas || [];
+          alerts.forEach((alert: any) => {
+            alert.createdAt =
+              alert.createdAt instanceof Timestamp
+                ? alert.createdAt.toDate()
+                : alert.createdAt;
+          });
           combined[doc.id] = {
             id: doc.id,
             ...estadoData[doc.id],
             ...pedidoData,
+            alertas: alerts,
             date,
           };
         });

@@ -1,3 +1,4 @@
+import { Colors } from "../enum/colors";
 import {
   CanalVenta,
   EstadoPedido,
@@ -39,8 +40,8 @@ export interface Producto {
 export interface PedidoEstado {
   estado: EstadoPedido;
   tags: string[];
-  alerts: string[];
-  notas: string[];
+  alertas: Alert[];
+  notas: Note[];
   logisticaAsignada: string;
   logisticaAsignadaManualmente: boolean;
   lastSyncedAt: string; // ISO date
@@ -60,6 +61,16 @@ export interface Zona {
   localidad: string;
   provincia: string;
 }
-
+export interface Alert {
+  id: string;
+  text: string;
+  color: Colors;
+  createdAt: Date;
+}
+export interface Note {
+  id: string;
+  text: string;
+  createdAt: Date;
+}
 // Resultado de unión de /pedidos y /pedidos_estado para el frontend
 export interface PedidoUnificado extends Pedido, PedidoEstado {}
