@@ -1,17 +1,34 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { OrderRow } from "./orderRow";
 import { useAsks } from "@/hooks/asks/useAsks";
 import { Button } from "@/components/ui/button";
 import { PedidoUnificado } from "@/lib/interfaces/order";
+import { getVentasMeli, refreshDataMeli } from "@/lib/services/meli";
 
-export default function Table() {
+export default function OrdersTable() {
   const { asks, loading, error, showMore } = useAsks({ limitQuantity: 10 });
+
+  // React Query para ventas de Meli
+  const {
+    data: ventasMeli,
+    isLoading: ventasLoading,
+    isError: ventasError,
+    refetch: refetchVentas,
+  } = useQuery({
+    queryKey: ["ventasMeli"],
+    queryFn: getVentasMeli,
+  });
 
   const filteredAsks = useMemo<PedidoUnificado[]>(() => {
     return Object.values(asks);
   }, [asks]);
+
+  useEffect(() => {
+    console.log({ ventasMeli });
+  }, [ventasMeli]);
 
   return (
     <div className="flex flex-col flex-1 bg-muted">
@@ -33,7 +50,11 @@ export default function Table() {
         )}
 
         {filteredAsks.map((pedido) => (
-          <OrderRow key={pedido.id} order={pedido} />
+          <OrderRow
+            refetchVentas={refetchVentas}
+            key={pedido.id}
+            order={pedido}
+          />
         ))}
       </div>
 

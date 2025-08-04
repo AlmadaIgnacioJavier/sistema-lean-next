@@ -12,8 +12,8 @@ import {
   QuerySnapshot,
   DocumentData,
 } from "firebase/firestore";
-import { showWindowAlert } from "@/lib/utils/general";
-import { PedidoUnificado } from "@/lib/interfaces/order";
+import { chunkArray, showWindowAlert } from "@/lib/utils/general";
+import { Alert, Note, PedidoUnificado } from "@/lib/interfaces/order";
 import { db } from "@/lib/firebase/firebase";
 import { COLLECTIONS } from "@/lib/constants/db";
 
@@ -21,6 +21,9 @@ interface UseAsksProps {
   limitQuantity?: number;
 }
 
+const parseDate = (date: Date | Timestamp): Date => {
+  return date instanceof Timestamp ? date.toDate() : date;
+};
 export function useAsks({ limitQuantity = 10 }: UseAsksProps = {}) {
   const [asks, setAsks] = useState<PedidoUnificado[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -35,7 +38,7 @@ export function useAsks({ limitQuantity = 10 }: UseAsksProps = {}) {
     setLoading(true);
 
     const pedidosEstadoQuery = query(
-      collection(db, COLLECTIONS.PEDIDOS_ESTADO),
+      collection(db, COLLECTIONS.PEDIDOS),
       orderBy("date", "desc"),
       limit(quantity)
     );
@@ -43,56 +46,29 @@ export function useAsks({ limitQuantity = 10 }: UseAsksProps = {}) {
     const unsubscribe = onSnapshot(
       pedidosEstadoQuery,
       async (snapshot: QuerySnapshot<DocumentData>) => {
-        const estadoData: Record<string, any> = {};
-        const pedidosIds: string[] = [];
-
-        snapshot.forEach((doc) => {
-          console.log(doc.data());
-          estadoData[doc.id] = doc.data();
-          pedidosIds.push(doc.id);
-        });
-
-        if (pedidosIds.length === 0) {
-          setLoading(false);
-          return;
-        }
-
-        const pedidosQuery = query(
-          collection(db, COLLECTIONS.PEDIDOS),
-          where(documentId(), "in", pedidosIds)
-        );
-        const pedidosSnapshot = await getDocs(pedidosQuery);
-
         const combined: Record<string, PedidoUnificado> = {};
+        snapshot.forEach((doc) => {
+          const pedidoData = doc.data() as PedidoUnificado;
+          const date = parseDate(pedidoData.date);
 
-        pedidosSnapshot.forEach((doc) => {
-          const pedidoData = doc.data();
-          const date =
-            pedidoData.date instanceof Timestamp
-              ? pedidoData.date.toDate()
-              : pedidoData.date;
+          const alertas = (pedidoData?.alertas || []).map((alert: Alert) => ({
+            ...alert,
+            createdAt: parseDate(alert.createdAt),
+          }));
+          const notas = (pedidoData?.notas || []).map((note: Note) => ({
+            ...note,
+            createdAt: parseDate(note.createdAt),
+          }));
 
-          const alerts = estadoData[doc.id]?.alertas || [];
-          alerts.forEach((alert: any) => {
-            alert.createdAt =
-              alert.createdAt instanceof Timestamp
-                ? alert.createdAt.toDate()
-                : alert.createdAt;
-          });
           combined[doc.id] = {
-            id: doc.id,
-            ...estadoData[doc.id],
             ...pedidoData,
-            alertas: alerts,
+            notas,
+            alertas,
             date,
           };
         });
 
-        const sorted = Object.values(combined).sort(
-          (a, b) => b.date.getTime() - a.date.getTime()
-        );
-
-        setAsks(sorted);
+        setAsks(Object.values(combined));
         setLoading(false);
       },
       (err) => {

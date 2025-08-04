@@ -37,12 +37,14 @@ import { changeState } from "@/lib/utils/firebase";
 import AlertGenerator from "./alertGenerator";
 import NoteGenerator from "./noteGenerator";
 import { PedidoUnificado } from "@/lib/interfaces/order";
+import ModalWraper from "../general/modalWraper";
 
 interface OrderRowProps {
   order: PedidoUnificado;
+  refetchVentas?: () => void;
 }
 
-export function OrderRow({ order }: OrderRowProps) {
+export function OrderRow({ order, refetchVentas }: OrderRowProps) {
   const { cliente, productos, estado, envio, date, alertas = [] } = order;
 
   const [modalAlertOpen, setModalAlertOpen] = useState(false);
@@ -146,19 +148,6 @@ export function OrderRow({ order }: OrderRowProps) {
           </DropdownMenu>
         </div>
 
-        {/* Fecha */}
-        <div className="flex items-center gap-3 min-w-[200px]">
-          <CalendarDays className="h-5 w-5 text-gray-400 dark:text-slate-500" />
-          <div>
-            <p className="text-sm text-gray-600 dark:text-slate-400 font-medium">
-              Última actualización
-            </p>
-            <p className="text-sm text-gray-800 dark:text-slate-200 max-w-24">
-              {formattedDate} hs
-            </p>
-          </div>
-        </div>
-
         {/* Menú de acciones */}
         <div className="absolute top-3 right-3 md:relative md:top-auto md:right-auto">
           <DropdownMenu>
@@ -223,23 +212,20 @@ export function OrderRow({ order }: OrderRowProps) {
           </div>
         </div>
       )}
-      {/* Modal para alerta */}
-      <Dialog open={modalAlertOpen} onOpenChange={setModalAlertOpen}>
-        <DialogContent className="max-w-7xl !p-0">
-          <DialogHeader className="px-6 pt-6">
-            <DialogTitle>Agregar alerta</DialogTitle>
-          </DialogHeader>
-          <AlertGenerator order={order} />
-        </DialogContent>
-      </Dialog>
-      <Dialog open={modalNotesOpen} onOpenChange={setModalNotesOpen}>
-        <DialogContent className="max-w-7xl !p-0">
-          <DialogHeader className="px-6 pt-6">
-            <DialogTitle>Agregar nota</DialogTitle>
-          </DialogHeader>
-          <NoteGenerator order={order} />
-        </DialogContent>
-      </Dialog>
+      <ModalWraper
+        open={modalAlertOpen}
+        onOpenChange={setModalAlertOpen}
+        title="Agregar alerta"
+      >
+        <AlertGenerator order={order} refetchVentas={refetchVentas} />
+      </ModalWraper>
+      <ModalWraper
+        open={modalNotesOpen}
+        onOpenChange={setModalNotesOpen}
+        title="Agregar nota"
+      >
+        <NoteGenerator order={order} refetchVentas={refetchVentas} />
+      </ModalWraper>
     </div>
   );
 }

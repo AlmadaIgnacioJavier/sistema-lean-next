@@ -28,7 +28,12 @@ import { formatDate, showWindowAlert } from "@/lib/utils/general";
 import { addNote, changeNote, changeNotes } from "@/lib/utils/firebase";
 import ConfirmDialog from "../general/ConfirmDialog";
 
-export default function NoteGenerator({ order }: { order: PedidoUnificado }) {
+export default function NoteGenerator({
+  order,
+}: {
+  order: PedidoUnificado;
+  refetchVentas?: () => void;
+}) {
   const [text, setText] = useState("");
   const [notes, setNotes] = useState<Note[]>(order.notas || []);
   const [editingId, setEditingId] = useState<string | null>(null);

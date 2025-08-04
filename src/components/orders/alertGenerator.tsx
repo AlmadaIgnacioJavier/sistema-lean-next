@@ -32,7 +32,12 @@ import { Colors } from "@/lib/enum/colors";
 import { addAlert, changeAlert } from "@/lib/utils/firebase";
 import ConfirmDialog from "../general/ConfirmDialog";
 
-export default function AlertGenerator({ order }: { order: PedidoUnificado }) {
+export default function AlertGenerator({
+  order,
+}: {
+  order: PedidoUnificado;
+  refetchVentas?: () => void;
+}) {
   const [text, setText] = useState("");
   const [selectedColor, setSelectedColor] = useState<Colors | null>(null);
   const [alerts, setAlerts] = useState<Alert[]>(order.alertas || []);
