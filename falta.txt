@@ -1,0 +1,9 @@
+4/8
+
+Falta acomodar la logica de las asks, ya que ahora no se guardan en firebase. Para eso hay que estructurar bien la funcion con los offset.
+Para que cuando se recargue la pagina, se carguen todos los asks. Ademas de que tambien el offset servirá para hacer la paginación de las asks.
+
+Tambien se debe actualizar el estado, alertas, notas y el shipment_type customizado a la nueva estructura
+
+Luego de eso, se debe hacer la page del custom de los pedidos con su respectiva zona para cada tipo. Y meterlo como middleware antes de mostrar. Eso sí se debe guardar en firebase
+
