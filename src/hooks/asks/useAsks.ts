@@ -16,15 +16,21 @@ import { chunkArray, showWindowAlert } from "@/lib/utils/general";
 import { Alert, Note, PedidoUnificado } from "@/lib/interfaces/order";
 import { db } from "@/lib/firebase/firebase";
 import { COLLECTIONS } from "@/lib/constants/db";
+import { refreshDataMeli } from "@/lib/services/meli";
+import { ORDER_STATUS } from "@/lib/constants";
 
 interface UseAsksProps {
   limitQuantity?: number;
+  statesNot?: ORDER_STATUS[];
 }
 
 const parseDate = (date: Date | Timestamp): Date => {
   return date instanceof Timestamp ? date.toDate() : date;
 };
-export function useAsks({ limitQuantity = 10 }: UseAsksProps = {}) {
+export function useAsks({
+  limitQuantity = 10,
+  statesNot = [],
+}: UseAsksProps = {}) {
   const [asks, setAsks] = useState<PedidoUnificado[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
@@ -37,8 +43,16 @@ export function useAsks({ limitQuantity = 10 }: UseAsksProps = {}) {
   useEffect(() => {
     setLoading(true);
 
+    const filters: any[] = [];
+
+    if (statesNot.length > 0) {
+      filters.push(where("estado", "not-in", statesNot));
+    }
+
     const pedidosEstadoQuery = query(
       collection(db, COLLECTIONS.PEDIDOS),
+      ...filters,
+      orderBy("estado", "asc"),
       orderBy("date", "desc"),
       limit(quantity)
     );
@@ -86,7 +100,22 @@ export function useAsks({ limitQuantity = 10 }: UseAsksProps = {}) {
     return () => {
       unsubscribe();
     };
-  }, [quantity]);
+  }, [quantity, statesNot]);
+
+  useEffect(() => {
+    refreshDataMeli()
+      .then((e) => {
+        console.log(
+          e.data.map((e: any) => ({
+            ...e,
+            date: new Date(e.date._seconds * 1000),
+          }))
+        );
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
 
   return { asks, loading, error, showMore };
 }

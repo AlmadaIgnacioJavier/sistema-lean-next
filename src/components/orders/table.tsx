@@ -1,38 +1,59 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import { OrderRow } from "./orderRow";
 import { useAsks } from "@/hooks/asks/useAsks";
 import { Button } from "@/components/ui/button";
 import { PedidoUnificado } from "@/lib/interfaces/order";
-import { getVentasMeli, refreshDataMeli } from "@/lib/services/meli";
+import { FILTERS_NOT_STATE, ORDER_STATUS } from "@/lib/constants";
+import { Switch } from "@/components/ui/switch";
 
-export default function OrdersTable() {
-  const { asks, loading, error, showMore } = useAsks({ limitQuantity: 10 });
+type OrdersTableProps = {
+  addFilter?: boolean;
+  initialFilterState?: ORDER_STATUS[];
+};
 
-  // React Query para ventas de Meli
-  const {
-    data: ventasMeli,
-    isLoading: ventasLoading,
-    isError: ventasError,
-    refetch: refetchVentas,
-  } = useQuery({
-    queryKey: ["ventasMeli"],
-    queryFn: getVentasMeli,
+export default function OrdersTable({
+  addFilter = true,
+  initialFilterState = FILTERS_NOT_STATE.notDelivered,
+}: OrdersTableProps) {
+  // Estado para alternar entre pedidos despachados o no
+  const [showShipped, setShowShipped] = useState<boolean>(false);
+  const [statesNot, setStatesNot] =
+    useState<ORDER_STATUS[]>(initialFilterState);
+
+  const handleToggle = (checked: boolean) => {
+    setShowShipped(checked);
+    setStatesNot(
+      checked ? FILTERS_NOT_STATE.shipped : FILTERS_NOT_STATE.notDelivered
+    );
+  };
+  useEffect(() => {
+    console.log({ statesNot });
+  }, [statesNot]);
+  const { asks, loading, error, showMore } = useAsks({
+    limitQuantity: 10,
+    statesNot: statesNot,
   });
 
   const filteredAsks = useMemo<PedidoUnificado[]>(() => {
     return Object.values(asks);
   }, [asks]);
 
-  useEffect(() => {
-    console.log({ ventasMeli });
-  }, [ventasMeli]);
-
   return (
     <div className="flex flex-col flex-1 bg-muted">
       <div className="flex flex-col gap-4 p-4">
+        {addFilter ? (
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">
+              No despachados
+            </span>
+            <div className="flex items-center gap-2">
+              <Switch checked={showShipped} onCheckedChange={handleToggle} />
+              <span className="text-sm font-medium">Despachados</span>
+            </div>
+          </div>
+        ) : null}
         {loading && filteredAsks.length === 0 && (
           <p className="text-center text-muted-foreground">
             Cargando pedidos...
@@ -49,13 +70,10 @@ export default function OrdersTable() {
           </p>
         )}
 
-        {filteredAsks.map((pedido) => (
-          <OrderRow
-            refetchVentas={refetchVentas}
-            key={pedido.id}
-            order={pedido}
-          />
-        ))}
+        {filteredAsks.length != 0 &&
+          filteredAsks.map((pedido: PedidoUnificado) => (
+            <OrderRow key={pedido.id} order={pedido} />
+          ))}
       </div>
 
       <div className="flex items-center justify-center p-4">

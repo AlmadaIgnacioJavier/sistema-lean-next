@@ -29,21 +29,20 @@ import { COLORS } from "@/lib/constants/colors";
 import { Alert, PedidoUnificado } from "@/lib/interfaces/order";
 import { formatDate, showWindowAlert } from "@/lib/utils/general";
 import { Colors } from "@/lib/enum/colors";
-import { addAlert, changeAlert } from "@/lib/utils/firebase";
 import ConfirmDialog from "../general/ConfirmDialog";
+import { addAlert, changeAlert } from "@/lib/utils/firebase";
 
 export default function AlertGenerator({
   order,
 }: {
   order: PedidoUnificado;
-  refetchVentas?: () => void;
+  modalAlertOpen: boolean;
 }) {
   const [text, setText] = useState("");
   const [selectedColor, setSelectedColor] = useState<Colors | null>(null);
   const [alerts, setAlerts] = useState<Alert[]>(order.alertas || []);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tabValue, setTabValue] = useState("create");
-
   const changeTab = (value: "create" | "active") => {
     setTabValue(value);
   };
@@ -295,11 +294,13 @@ export default function AlertGenerator({
                 ) : (
                   <div className="pr-2 flex flex-col gap-1">
                     {alerts.map((note, index) => (
-                      <div key={note.id}>
+                      <div key={index}>
                         <div
                           className={`
                           relative p-3 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md m-3
-                          ${note.color} ${COLORS[note.color].value}
+                          ${note.color} ${COLORS[note.color].value} ${
+                            COLORS[note.color].textColor
+                          }
                           ${
                             editingId === note.id
                               ? "ring-2 ring-amber-400 ring-offset-2"

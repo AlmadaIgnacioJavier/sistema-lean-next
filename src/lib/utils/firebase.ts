@@ -20,7 +20,7 @@ export const changeState = async (
       });
       return;
     }
-    await updateDoc(doc(db, "pedidos_estado", id), { estado });
+    await updateDoc(doc(db, COLLECTIONS.PEDIDOS, id), { estado });
   } catch (err: unknown) {
     console.error("Error al cambiar estado:", err);
     showWindowAlert({
@@ -46,7 +46,7 @@ export const changeAlert = async (
       return false;
     }
 
-    await updateDoc(doc(db, COLLECTIONS.PEDIDOS_ESTADO, id), {
+    await updateDoc(doc(db, COLLECTIONS.PEDIDOS, id), {
       alertas: alertas.map((alert) => ({
         ...alert,
         createdAt:
@@ -88,7 +88,7 @@ export const addAlert = async (
     }
 
     // Consultar el documento actual
-    const docRef = doc(db, COLLECTIONS.PEDIDOS_ESTADO, id);
+    const docRef = doc(db, COLLECTIONS.PEDIDOS, id);
     const docSnap = await getDoc(docRef);
     let alertas: Alert[] = [];
     if (docSnap.exists()) {
@@ -138,7 +138,7 @@ export const addNote = async (
     }
 
     // Consultar el documento actual
-    const docRef = doc(db, COLLECTIONS.PEDIDOS_ESTADO, id);
+    const docRef = doc(db, COLLECTIONS.PEDIDOS, id);
     const docSnap = await getDoc(docRef);
     let notas: Note[] = [];
     if (docSnap.exists()) {
@@ -187,7 +187,7 @@ export const changeNote = async (
     }
 
     // Consultar el documento actual
-    const docRef = doc(db, COLLECTIONS.PEDIDOS_ESTADO, id);
+    const docRef = doc(db, COLLECTIONS.PEDIDOS, id);
     const docSnap = await getDoc(docRef);
     let notas: Note[] = [];
     if (docSnap.exists()) {
@@ -231,7 +231,7 @@ export const changeNotes = async (
       return false;
     }
 
-    await updateDoc(doc(db, COLLECTIONS.PEDIDOS_ESTADO, id), {
+    await updateDoc(doc(db, COLLECTIONS.PEDIDOS, id), {
       notas: notas.map((note) => ({
         ...note,
         createdAt:

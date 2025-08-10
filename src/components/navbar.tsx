@@ -18,13 +18,13 @@ import { ThemeSwitch } from "@/components/theme-switch";
 const menuItems = [
   {
     icon: Home,
-    label: "Inicio",
+    label: "Pedidos",
     href: "/",
   },
   {
     icon: User,
-    label: "Perfil",
-    href: "/profile",
+    label: "Finalizados",
+    href: "/finalizados",
   },
   {
     icon: Settings,

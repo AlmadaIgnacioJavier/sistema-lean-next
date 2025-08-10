@@ -77,19 +77,46 @@ export const PRODUCTS = [
     lastSyncedAt: "2025-07-14T11:20:00Z",
   },
 ];
-export const PRODUCT_STATE = {
-  SIN_ARMAR: "sin armar",
-  ARMADO: "armado",
-  EMPAQUETADO: "empaquetado",
-  DESPACHADO: "despachado",
-  ENTREGADO: "entregado",
-  CANCELADO: "cancelado",
+export const enum ORDER_STATUS {
+  SIN_ARMAR = "sin armar",
+  ARMADO = "armado",
+  EMPAQUETADO = "empaquetado",
+  DESPACHADO = "despachado",
+  ENTREGADO = "entregado",
+  CANCELADO = "cancelado",
+}
+export const PRODUCT_STATE: Record<string, ORDER_STATUS> = {
+  SIN_ARMAR: ORDER_STATUS.SIN_ARMAR,
+  ARMADO: ORDER_STATUS.ARMADO,
+  EMPAQUETADO: ORDER_STATUS.EMPAQUETADO,
+  DESPACHADO: ORDER_STATUS.DESPACHADO,
+  ENTREGADO: ORDER_STATUS.ENTREGADO,
+  CANCELADO: ORDER_STATUS.CANCELADO,
 };
 export const statusColors = {
-  [PRODUCT_STATE.SIN_ARMAR]: "bg-black",
-  [PRODUCT_STATE.ARMADO]: "bg-blue-500",
-  [PRODUCT_STATE.EMPAQUETADO]: "bg-yellow-500 text-black",
-  [PRODUCT_STATE.DESPACHADO]: "bg-orange-500",
-  [PRODUCT_STATE.ENTREGADO]: "bg-green-500",
-  [PRODUCT_STATE.CANCELADO]: "bg-red-500",
+  [PRODUCT_STATE.SIN_ARMAR]: "bg-black hover:bg-black/80 transition",
+  [PRODUCT_STATE.ARMADO]: "bg-blue-500 hover:bg-blue-400 transition",
+  [PRODUCT_STATE.EMPAQUETADO]:
+    "bg-yellow-500 text-black hover:bg-yellow-600 transition",
+  [PRODUCT_STATE.DESPACHADO]:
+    "bg-orange-500 hover:bg-orange-600 transition dark:text-black",
+  [PRODUCT_STATE.ENTREGADO]: "bg-green-500 hover:bg-green-600/80 transition",
+  [PRODUCT_STATE.CANCELADO]: "bg-red-500 hover:bg-red-600 transition",
+};
+export const FILTERS_NOT_STATE = {
+  notDelivered: [
+    PRODUCT_STATE.DESPACHADO,
+    PRODUCT_STATE.ENTREGADO,
+    PRODUCT_STATE.CANCELADO,
+  ],
+  shipped: Object.values(PRODUCT_STATE).filter(
+    (state) => state != PRODUCT_STATE.DESPACHADO
+  ),
+  finished: Object.values(PRODUCT_STATE).filter(
+    (state) => state != PRODUCT_STATE.ENTREGADO
+  ),
+  finished_cancelled: Object.values(PRODUCT_STATE).filter(
+    (state) =>
+      state != PRODUCT_STATE.ENTREGADO || state != PRODUCT_STATE.CANCELADO
+  ),
 };

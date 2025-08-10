@@ -5,6 +5,7 @@ export interface ColorProps {
   name: Colors;
   textColor: string;
 }
+
 export const COLORS: Record<Colors, ColorProps> = {
   [Colors.Rojo]: {
     value: "bg-red-500",
@@ -14,12 +15,12 @@ export const COLORS: Record<Colors, ColorProps> = {
   [Colors.Naranja]: {
     value: "bg-orange-500",
     name: Colors.Naranja,
-    textColor: "text-white",
+    textColor: "text-black",
   },
   [Colors.Amarillo]: {
-    value: "bg-yellow-500",
+    value: "bg-yellow-400",
     name: Colors.Amarillo,
-    textColor: "text-white",
+    textColor: "text-black",
   },
   [Colors.Verde]: {
     value: "bg-green-500",
@@ -27,33 +28,33 @@ export const COLORS: Record<Colors, ColorProps> = {
     textColor: "text-white",
   },
   [Colors.Turquesa]: {
-    value: "bg-teal-500",
+    value: "bg-teal-400",
     name: Colors.Turquesa,
-    textColor: "text-white",
+    textColor: "text-black",
   },
   [Colors.Azul]: {
     value: "bg-blue-500",
     name: Colors.Azul,
     textColor: "text-white",
   },
-  [Colors.Índigo]: {
+  [Colors["Índigo"]]: {
     value: "bg-indigo-500",
-    name: Colors.Índigo,
+    name: Colors["Índigo"],
     textColor: "text-white",
   },
-  [Colors.Púrpura]: {
+  [Colors["Púrpura"]]: {
     value: "bg-purple-500",
-    name: Colors.Púrpura,
+    name: Colors["Púrpura"],
     textColor: "text-white",
   },
   [Colors.Rosa]: {
-    value: "bg-pink-500",
+    value: "bg-pink-400",
     name: Colors.Rosa,
-    textColor: "text-white",
+    textColor: "text-black",
   },
   [Colors.Gris]: {
-    value: "bg-gray-500",
+    value: "bg-gray-400",
     name: Colors.Gris,
-    textColor: "text-white",
+    textColor: "text-black",
   },
 };

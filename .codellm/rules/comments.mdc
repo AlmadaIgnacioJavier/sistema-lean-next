@@ -1,0 +1,23 @@
+---
+description: Documentation & Typing
+globs: *tsx, *ts, *jsx, *js
+alwaysApply: true
+---
+
+# Your rule content
+
+- No usage of `any`. If the type is unknown, use `unknown` or add a TODO with guidance on how to determine the type.
+- All exported types must be interfaces or type aliases with descriptive PascalCase names.
+- Use `readonly` for immutable properties and `as const` for immutable arrays/objects.
+- Avoid duplicate type definitions — move shared types to a `types/` or `interfaces/` directory.
+- Prefer derived types (`ReturnType`, `Parameters`, `InstanceType`) to keep types in sync with implementation.
+- Every exported function and public component must have a JSDoc/TSdoc block with:
+  - Clear description of its purpose.
+  - Parameters with type and short description.
+  - Return type with description.
+  - Notes or warnings if applicable.
+- Props and State must always be defined with interfaces; avoid `React.FC` unless using `children`.
+- For API routes, define request and response schemas using Zod or Yup and derive types with `z.infer`.
+- Firestore documents must use strict interfaces and Firestore `Timestamp`, not `Date`.
+- Each newly created component must include a clear, up-to-date documentation block describing its purpose, props, state, events, and usage examples if needed.
+- Every time a `utils` function is modified, its documentation must be updated to reflect the changes. If no documentation exists, it must be created before committing.

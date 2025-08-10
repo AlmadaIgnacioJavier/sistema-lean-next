@@ -20,12 +20,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { PRODUCT_STATE, statusColors } from "@/lib/constants";
 import { COLORS } from "@/lib/constants/colors";
 import {
@@ -41,10 +35,9 @@ import ModalWraper from "../general/modalWraper";
 
 interface OrderRowProps {
   order: PedidoUnificado;
-  refetchVentas?: () => void;
 }
 
-export function OrderRow({ order, refetchVentas }: OrderRowProps) {
+export function OrderRow({ order }: OrderRowProps) {
   const { cliente, productos, estado, envio, date, alertas = [] } = order;
 
   const [modalAlertOpen, setModalAlertOpen] = useState(false);
@@ -55,14 +48,6 @@ export function OrderRow({ order, refetchVentas }: OrderRowProps) {
     const colorConfig = COLORS[colorName as keyof typeof COLORS];
     return colorConfig ? colorConfig.value : "bg-gray-100 text-gray-800";
   };
-
-  const formattedDate = new Date(date).toLocaleString("es-AR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 
   const extraActions = [
     {
@@ -100,9 +85,14 @@ export function OrderRow({ order, refetchVentas }: OrderRowProps) {
   return (
     <div className="flex flex-col bg-white dark:bg-slate-900 rounded-xl p-4 border border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all duration-200">
       <div className="group   flex flex-wrap md:flex-nowrap md:items-center md:justify-between gap-4 relative w-full">
+        {/* Fecha arriba a la izquierda */}
         {/* Producto y cliente */}
         <div className="flex items-center gap-4 flex-1 min-w-full md:min-w-0">
-          <div className="truncate">
+          <div className="truncate flex flex-col gap-2">
+            <div className="flex items-center gap-1 text-[10px] md:text-xs text-gray-500 dark:text-slate-400">
+              <CalendarDays className="h-3 w-3" />
+              <span>{date ? formatDate(date) : ""}</span>
+            </div>
             <h3 className="font-semibold text-gray-800 dark:text-slate-200 truncate pr-6 md:pr-0">
               {productos[0].titulo} (x{productos[0].cantidad})
             </h3>
@@ -130,18 +120,22 @@ export function OrderRow({ order, refetchVentas }: OrderRowProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Badge
-                className={`capitalize text-white font-medium px-3 ${
+                className={`uppercase text-white font-medium px-3 py-1 select-none cursor-pointer text-sm ${
                   statusColors[estado || PRODUCT_STATE.SIN_ARMAR]
                 }`}
               >
                 {estado || PRODUCT_STATE.SIN_ARMAR}
               </Badge>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
+            <DropdownMenuContent
+              align="start"
+              className="divide-y divide-gray-200 dark:divide-slate-700"
+            >
               {stateActions.map((action, index) => (
                 <DropdownMenuItem key={index} onClick={action.onClick}>
-                  {action.icon}
-                  <span className="ml-2">{action.label}</span>
+                  <span className="ml-2 uppercase text-xs font-semibold py-0.5 px-2">
+                    {action.label}
+                  </span>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -172,16 +166,17 @@ export function OrderRow({ order, refetchVentas }: OrderRowProps) {
       {alertas && alertas.length > 0 && (
         <div className="w-full md:col-span-full mt-4 space-y-2">
           <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-            {alertas.map((alerta) => (
-              <div key={alerta.id} className="relative group">
+            {alertas.map((alerta, index) => (
+              <div key={index} className="relative group">
                 <Alert
                   className={`${getAlertColor(
                     alerta.color
                   )} border-0 shadow-sm w-fit-content flex items-center gap-2`}
                 >
                   <AlertTriangle
-                    className="h-5 w-5 flex justify-center items-center mb-1 h-full  "
-                    color="white"
+                    className={`h-5 w-5 flex justify-center items-center mb-1 h-full !${
+                      COLORS[alerta.color]?.textColor
+                    }`}
                   />
                   <AlertDescription
                     className={`text-sm font-medium ${
@@ -217,14 +212,14 @@ export function OrderRow({ order, refetchVentas }: OrderRowProps) {
         onOpenChange={setModalAlertOpen}
         title="Agregar alerta"
       >
-        <AlertGenerator order={order} refetchVentas={refetchVentas} />
+        <AlertGenerator order={order} modalAlertOpen={modalAlertOpen} />
       </ModalWraper>
       <ModalWraper
         open={modalNotesOpen}
         onOpenChange={setModalNotesOpen}
         title="Agregar nota"
       >
-        <NoteGenerator order={order} refetchVentas={refetchVentas} />
+        <NoteGenerator order={order} />
       </ModalWraper>
     </div>
   );
