@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -13,6 +13,7 @@ import {
   MessageCircle,
   Truck,
   AlertTriangle,
+  FileText,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -65,6 +66,11 @@ export function OrderRow({ order }: OrderRowProps) {
       icon: <MessageCircle className="h-4 w-4 text-green-500" />,
       onClick: () => setModalNotesOpen(true),
     },
+    {
+      label: "Generar remito",
+      icon: <FileText className="h-4 w-4 text-blue-500" />,
+      onClick: () => alert("generar remito"),
+    },
   ];
 
   const stateActions = Object.values(PRODUCT_STATE).map((state) => ({
@@ -81,6 +87,10 @@ export function OrderRow({ order }: OrderRowProps) {
       removeAllWindows();
     },
   }));
+
+  useEffect(() => {
+    console.log({ order });
+  }, [stateActions]);
 
   return (
     <div className="flex flex-col bg-white dark:bg-slate-900 rounded-xl p-4 border border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all duration-200">

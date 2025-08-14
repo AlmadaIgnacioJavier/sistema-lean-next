@@ -1,7 +1,18 @@
 "use client";
 
-import React from "react";
-import { Menu, Home, User, Settings, LogOut, X } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import useRouter from "@/lib/useRouter";
+import { usePathname } from "next/navigation";
+import {
+  Menu,
+  Home,
+  LogOut,
+  X,
+  CheckCircle,
+  Ban,
+  Truck,
+  Settings,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -14,6 +25,7 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { ThemeSwitch } from "@/components/theme-switch";
+import Spinner from "./ui/spinner";
 
 const menuItems = [
   {
@@ -22,25 +34,57 @@ const menuItems = [
     href: "/",
   },
   {
-    icon: User,
+    icon: CheckCircle,
     label: "Finalizados",
     href: "/finalizados",
   },
   {
+    icon: Ban,
+    label: "Cancelados",
+    href: "/cancelados",
+  },
+  {
+    icon: Truck,
+    label: "Envío",
+    href: "/envio",
+  },
+  {
     icon: Settings,
-    label: "Ajustes",
-    href: "/settings",
+    label: "Configuración",
+    href: "/configuracion",
   },
 ];
 
 export function Navbar() {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const [navLoading, setNavLoading] = useState(false);
+  const targetRef = useRef<string | null>(null);
+
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleMenuItemClick = (href: string) => {
-    // Aquí puedes agregar la lógica de navegación
-    console.log(`Navegando a: ${href}`);
     setIsOpen(false);
+    // If already on the same path, do nothing
+    if (href === pathname) return;
+    // Mark target and show skeleton while navigation happens
+    targetRef.current = href;
+    setNavLoading(true);
+    router.push(href);
   };
+
+  useEffect(() => {
+    // When pathname changes and matches the target, hide the skeleton
+    if (navLoading && targetRef.current && pathname === targetRef.current) {
+      setNavLoading(false);
+      targetRef.current = null;
+    }
+    // If navLoading was true but no target (edge), hide it
+    if (navLoading && !targetRef.current) {
+      setNavLoading(false);
+    }
+  }, [pathname, navLoading]);
 
   const handleLogout = () => {
     // Aquí puedes agregar la lógica de cerrar sesión
@@ -50,6 +94,18 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      {/* Overlay/esqueleto global mientras navega */}
+      {navLoading && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 h-screen w-screen h-screen"
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+        >
+          <Spinner />
+        </div>
+      )}
+
       <div className="flex h-16 items-center justify-between px-4 w-full">
         {/* Lado izquierdo - Menú hamburguesa */}
         <div className="flex items-center">
@@ -103,7 +159,7 @@ export function Navbar() {
                         <Button
                           key={item.href}
                           variant="ghost"
-                          className="w-full justify-start h-12 text-base font-medium hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg"
+                          className="bg-slate-100 dark:bg-slate-800 dark:outline dark:outline-1 dark:shadow hover:bg-slate-200 dark:bg-slate-800 hover:outline-2 w-full justify-start h-12 text-base font-medium hover:text-accent-foreground transition-colors duration-200 rounded-lg cursor-pointer"
                           onClick={() => handleMenuItemClick(item.href)}
                         >
                           <Icon className="mr-3 h-5 w-5" />
@@ -112,18 +168,6 @@ export function Navbar() {
                       );
                     })}
                   </div>
-                </div>
-
-                {/* Footer del drawer */}
-                <div className="px-6 py-4 border-t mt-auto">
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start h-12 text-base font-medium text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors duration-200 rounded-lg"
-                    onClick={handleLogout}
-                  >
-                    <LogOut className="mr-3 h-5 w-5" />
-                    Cerrar sesión
-                  </Button>
                 </div>
               </div>
             </SheetContent>

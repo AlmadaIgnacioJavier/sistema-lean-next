@@ -119,4 +119,7 @@ export const FILTERS_NOT_STATE = {
     (state) =>
       state != PRODUCT_STATE.ENTREGADO || state != PRODUCT_STATE.CANCELADO
   ),
+  cancelled: Object.values(PRODUCT_STATE).filter(
+    (state) => state != PRODUCT_STATE.CANCELADO
+  ),
 };

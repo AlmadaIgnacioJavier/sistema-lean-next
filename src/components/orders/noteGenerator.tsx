@@ -188,8 +188,8 @@ export default function NoteGenerator({
                         maxLength={500}
                       />
                       <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>Máximo 500 caracteres</span>
-                        <span>{text.length}/500</span>
+                        <span>Máximo 200 caracteres</span>
+                        <span>{text.length}/200</span>
                       </div>
                     </div>
 

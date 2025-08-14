@@ -1,15 +1,21 @@
 "use client";
 
-import React from "react";
+import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Switch } from "@/components/ui/switch";
 
 export function ThemeSwitch() {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  React.useEffect(() => {
+  const isDark = theme === "dark";
+
+  const handleThemeChange = (checked: boolean) => {
+    setTheme(checked ? "dark" : "light");
+  };
+
+  useEffect(() => {
     setMounted(true);
   }, []);
 
@@ -22,13 +28,6 @@ export function ThemeSwitch() {
       </div>
     );
   }
-
-  const isDark = theme === "dark";
-
-  const handleThemeChange = (checked: boolean) => {
-    setTheme(checked ? "dark" : "light");
-  };
-
   return (
     <div className="flex items-center space-x-2 group">
       <Sun
@@ -41,7 +40,7 @@ export function ThemeSwitch() {
       <Switch
         checked={isDark}
         onCheckedChange={handleThemeChange}
-        className="data-[state=checked]:bg-slate-700 data-[state=unchecked]:bg-yellow-100 border-2 data-[state=checked]:border-slate-600 data-[state=unchecked]:border-yellow-200 transition-all duration-300"
+        className="data-[state=checked]:bg-slate-700 data-[state=unchecked]:bg-yellow-500 border-2 data-[state=checked]:border-slate-600 data-[state=unchecked]:border-yellow-200 transition-all duration-300 cursor-pointer"
         aria-label={`Cambiar a modo ${isDark ? "claro" : "oscuro"}`}
       />
       <Moon

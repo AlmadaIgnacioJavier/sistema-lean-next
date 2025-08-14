@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PedidoUnificado } from "@/lib/interfaces/order";
 import { FILTERS_NOT_STATE, ORDER_STATUS } from "@/lib/constants";
 import { Switch } from "@/components/ui/switch";
+import { MessagesTable } from "./messagesTable";
 
 type OrdersTableProps = {
   addFilter?: boolean;
@@ -28,11 +29,8 @@ export default function OrdersTable({
       checked ? FILTERS_NOT_STATE.shipped : FILTERS_NOT_STATE.notDelivered
     );
   };
-  useEffect(() => {
-    console.log({ statesNot });
-  }, [statesNot]);
   const { asks, loading, error, showMore } = useAsks({
-    limitQuantity: 10,
+    limitQuantity: 20,
     statesNot: statesNot,
   });
 
@@ -45,30 +43,17 @@ export default function OrdersTable({
       <div className="flex flex-col gap-4 p-4">
         {addFilter ? (
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">
-              No despachados
-            </span>
             <div className="flex items-center gap-2">
               <Switch checked={showShipped} onCheckedChange={handleToggle} />
               <span className="text-sm font-medium">Despachados</span>
             </div>
           </div>
         ) : null}
-        {loading && filteredAsks.length === 0 && (
-          <p className="text-center text-muted-foreground">
-            Cargando pedidos...
-          </p>
-        )}
-        {error && (
-          <p className="text-center text-destructive">
-            Error al cargar los pedidos.
-          </p>
-        )}
-        {!loading && !error && filteredAsks.length === 0 && (
-          <p className="text-center text-muted-foreground">
-            No se encontraron pedidos con los filtros aplicados.
-          </p>
-        )}
+        <MessagesTable
+          loading={loading}
+          error={error}
+          itemsCount={filteredAsks.length}
+        />
 
         {filteredAsks.length != 0 &&
           filteredAsks.map((pedido: PedidoUnificado) => (
