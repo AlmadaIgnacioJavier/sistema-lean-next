@@ -53,7 +53,7 @@ export default function MultiSelect({
         <PopoverTrigger asChild>
           <button
             aria-expanded={open}
-            className={`w-full bg-white outline outline-1 outline-slate-400 p-2 shadow justify-between rounded-2xl !min-h-13 !max-h-[20em] ${
+            className={`w-full bg-muted outline outline-1 outline-slate-400 p-2 shadow justify-between rounded-2xl !min-h-13 !max-h-[20em] ${
               disabled && "opacity-60 cursor-not-allowed"
             }`}
             disabled={disabled}
@@ -72,7 +72,7 @@ export default function MultiSelect({
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.9, opacity: 0 }}
-                        className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs"
+                        className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs bg-background"
                       >
                         {label}
                       </motion.span>

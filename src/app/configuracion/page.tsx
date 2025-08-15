@@ -395,7 +395,10 @@ function FieldError({
   name: keyof CompanyBillingData;
   errors: FieldErrors<CompanyBillingData>;
 }) {
-  const err = errors?.[name]?.message as string | undefined;
+  // FieldErrors uses string index signatures internally and indexing with
+  // a `keyof CompanyBillingData` can cause a TypeScript error. Cast to any
+  // when indexing to keep the runtime behavior and satisfy the compiler.
+  const err = (errors as any)?.[name]?.message as string | undefined;
   if (!err) return null;
   return <p className="text-sm text-destructive mt-1">{err}</p>;
 }

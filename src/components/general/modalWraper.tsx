@@ -1,5 +1,6 @@
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Separator } from "../ui/separator";
 
 type Props = {
   open: boolean;
@@ -12,11 +13,12 @@ function ModalWraper({ open, onOpenChange, children, title }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-7xl !p-0">
-        <DialogHeader className="px-6 pt-6">
+        <DialogHeader className="px-6 pt-4">
           {title ? (
             <DialogTitle>{title || "Agregar alerta"}</DialogTitle>
           ) : null}
         </DialogHeader>
+        <Separator />
         {children}
       </DialogContent>
     </Dialog>

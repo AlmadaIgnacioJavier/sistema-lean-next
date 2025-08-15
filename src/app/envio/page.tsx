@@ -6,10 +6,27 @@ import { useEffect } from "react";
 import { getLocalities } from "@/lib/services/shipment";
 import { Option } from "@/lib/constants/shipment";
 import { useShippingStore } from "./store";
+import { useLogistics } from "@/hooks/shipping/useLogistics";
 
 const ShippingRulesPage = () => {
-  const { setLocalitiesByProvince, province, resetLocalitiesSelection } =
-    useShippingStore();
+  const {
+    setLocalitiesByProvince,
+    province,
+    resetLocalitiesSelection,
+    setCarriers,
+  } = useShippingStore();
+  const { logistics } = useLogistics();
+
+  useEffect(() => {
+    console.log("Logistics data:", logistics);
+    if (Array.isArray(logistics)) {
+      const parseLogistics = logistics.map((item) => ({
+        value: item.id,
+        label: item.name,
+      }));
+      setCarriers(parseLogistics);
+    }
+  }, [logistics]);
 
   useEffect(() => {
     resetLocalitiesSelection();

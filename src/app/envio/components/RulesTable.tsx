@@ -7,10 +7,10 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { useShippingStore } from "../store";
 import RulesTableItem from "./RulesTableItem";
+import { useRules } from "@/hooks/shipping/useRules";
 const RulesTable: React.FC = () => {
-  const { rules } = useShippingStore();
+  const { rules, deleteRule } = useRules();
   return (
     <Table>
       <TableHeader>
@@ -18,7 +18,7 @@ const RulesTable: React.FC = () => {
           <TableHead>Tipo de envío</TableHead>
           <TableHead>Provincia</TableHead>
           <TableHead>Localidades</TableHead>
-          <TableHead>Carrier</TableHead>
+          <TableHead>Logistica</TableHead>
           <TableHead className="text-right">Acciones</TableHead>
         </TableRow>
       </TableHeader>
@@ -32,7 +32,9 @@ const RulesTable: React.FC = () => {
             </TableCell>
           </TableRow>
         ) : (
-          rules.map((r) => <RulesTableItem key={r.id} ruleId={r.id} />)
+          rules.map((r) => (
+            <RulesTableItem key={r.id} ruleId={r.id} deleteRule={deleteRule} />
+          ))
         )}
       </TableBody>
     </Table>

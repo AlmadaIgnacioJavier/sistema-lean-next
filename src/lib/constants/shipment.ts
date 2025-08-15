@@ -14,5 +14,4 @@ export type Rule = {
   allLocalities: boolean;
   localityValues: string[]; // option values
   carrier: string; // value
-  groupName?: string; // optional, for display if user applied a whole group
 };

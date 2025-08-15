@@ -5,10 +5,10 @@ import { Option, Rule } from "@/lib/constants/shipment";
 
 type ShippingStore = {
   // Options
-  carriers: Option[];
   shippingTypes: Option[];
   provinces: Option[];
   localitiesByProvince: Option[];
+  carriers: Option[];
 
   // Current selections
   shippingType: string;
@@ -26,6 +26,7 @@ type ShippingStore = {
   setAllLocalities: (v: boolean) => void;
   setLocalityValues: (v: string[]) => void;
   setCarrier: (v: string) => void;
+  setCarriers: (opts: Option[]) => void;
   setLocalitiesByProvince: (opts: Option[]) => void;
   resetLocalitiesSelection: () => void;
   addRule: () => void;
@@ -70,13 +71,6 @@ const DEMO_PROVINCES: Option[] = [
 
 const DEMO_LOCALITIES: Option[] = [];
 
-const DEMO_CARRIERS: Option[] = [
-  { value: "correo_argentino", label: "Correo Argentino" },
-  { value: "oca", label: "OCA" },
-  { value: "andreani", label: "Andreani" },
-  { value: "motomensajeria", label: "Moto (Last-Mile)" },
-];
-
 export const useShippingStore = create<ShippingStore>(
   (
     set: (
@@ -87,10 +81,10 @@ export const useShippingStore = create<ShippingStore>(
     get
   ) => ({
     // Options
-    carriers: DEMO_CARRIERS,
     shippingTypes: DEMO_SHIPPING_TYPES,
     provinces: DEMO_PROVINCES,
     localitiesByProvince: DEMO_LOCALITIES,
+    carriers: [],
 
     // Current selections
     shippingType: DEMO_SHIPPING_TYPES[0]?.value ?? "",
@@ -108,6 +102,7 @@ export const useShippingStore = create<ShippingStore>(
     setAllLocalities: (v: boolean) => set({ allLocalities: v }),
     setLocalityValues: (v: string[]) => set({ localityValues: v }),
     setCarrier: (v: string) => set({ carrier: v }),
+    setCarriers: (opts: Option[]) => set({ carriers: opts }),
     setLocalitiesByProvince: (opts: Option[]) =>
       set({ localitiesByProvince: opts }),
     resetLocalitiesSelection: () =>

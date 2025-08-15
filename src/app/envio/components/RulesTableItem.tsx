@@ -2,23 +2,26 @@ import React from "react";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Edit3, Trash2 } from "lucide-react";
+import ConfirmDialog from "@/components/general/ConfirmDialog";
 import { Rule } from "@/lib/constants/shipment";
 import { useShippingStore } from "../store";
+import { useRules } from "@/hooks/shipping/useRules";
 
 interface RulesTableItemProps {
   ruleId: string;
+  deleteRule: (id: string) => void;
 }
 
-const RulesTableItem: React.FC<RulesTableItemProps> = ({ ruleId }) => {
-  const {
-    rules,
-    shippingTypes,
-    provinces,
-    localitiesByProvince,
-    carriers,
-    removeRule,
-  } = useShippingStore();
-  const rule = rules.find((r) => r.id === ruleId) as Rule;
+const RulesTableItem: React.FC<RulesTableItemProps> = ({
+  ruleId,
+  deleteRule,
+}) => {
+  const { shippingTypes, provinces, localitiesByProvince, carriers } =
+    useShippingStore();
+
+  const { rules } = useRules();
+  const rule = rules.find((r) => r.id === ruleId) as Rule | undefined;
+  if (!rule) return null;
   const st =
     shippingTypes.find((t) => t.value === rule.shippingType)?.label ??
     rule.shippingType;
@@ -43,24 +46,22 @@ const RulesTableItem: React.FC<RulesTableItemProps> = ({ ruleId }) => {
       <TableCell>{carr}</TableCell>
       <TableCell className="text-right">
         <div className="flex items-center justify-end gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full"
-            aria-label="Editar"
-            disabled
+          <ConfirmDialog
+            title="¿Eliminar regla?"
+            description="Esta acción no se puede deshacer. ¿Deseas eliminar la regla de envío?"
+            confirmText="Eliminar"
+            cancelText="Cancelar"
+            onConfirm={() => deleteRule(rule.id)}
           >
-            <Edit3 className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full hover:text-destructive"
-            onClick={() => removeRule(rule.id)}
-            aria-label="Eliminar"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="rounded-md bg-red-100 dark:bg-red-900/40 dark:hover:bg-red-900/20 text-red-600 dark:text-white transition-colors active:bg-red-200 dark:active:bg-red-800/70"
+              aria-label="Eliminar"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </ConfirmDialog>
         </div>
       </TableCell>
     </TableRow>

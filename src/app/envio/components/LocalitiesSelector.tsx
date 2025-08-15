@@ -2,14 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
 import { ListPlus } from "lucide-react";
 import MultiSelect from "./multiSelect";
 import { useShippingStore } from "../store";
