@@ -14,7 +14,7 @@ type ShippingStore = {
   shippingType: string;
   province: string;
   allLocalities: boolean;
-  localityValues: string[];
+  localityValues: Option[];
   carrier: string;
 
   // Rules
@@ -24,7 +24,7 @@ type ShippingStore = {
   setShippingType: (v: string) => void;
   setProvince: (v: string) => void;
   setAllLocalities: (v: boolean) => void;
-  setLocalityValues: (v: string[]) => void;
+  setLocalityValues: (v: Option[]) => void;
   setCarrier: (v: string) => void;
   setCarriers: (opts: Option[]) => void;
   setLocalitiesByProvince: (opts: Option[]) => void;
@@ -32,14 +32,15 @@ type ShippingStore = {
   addRule: () => void;
   removeRule: (id: string) => void;
   getRuleById: (id: string) => Rule | undefined;
+  cleanForm: () => void;
 };
 
 // Demo/static data centralization
 const DEMO_SHIPPING_TYPES: Option[] = [
-  { value: "standard", label: "Estándar" },
-  { value: "express", label: "Express" },
-  { value: "same_day", label: "Mismo día" },
-  { value: "fulfillment", label: "Fulfillment" },
+  { value: "entrega_a_convenir", label: "Entrega a convenir" },
+  { value: "flex", label: "Flex" },
+  { value: "mercado_envios", label: "Mercado envíos" },
+  { value: "full", label: "Full" },
 ];
 
 const DEMO_PROVINCES: Option[] = [
@@ -100,7 +101,7 @@ export const useShippingStore = create<ShippingStore>(
     setShippingType: (v: string) => set({ shippingType: v }),
     setProvince: (v: string) => set({ province: v }),
     setAllLocalities: (v: boolean) => set({ allLocalities: v }),
-    setLocalityValues: (v: string[]) => set({ localityValues: v }),
+    setLocalityValues: (v: Option[]) => set({ localityValues: v }),
     setCarrier: (v: string) => set({ carrier: v }),
     setCarriers: (opts: Option[]) => set({ carriers: opts }),
     setLocalitiesByProvince: (opts: Option[]) =>
@@ -125,5 +126,13 @@ export const useShippingStore = create<ShippingStore>(
         rules: s.rules.filter((r: Rule) => r.id !== id),
       })),
     getRuleById: (id: string) => get().rules.find((r: Rule) => r.id === id),
+    cleanForm: () =>
+      set({
+        shippingType: "",
+        province: "",
+        allLocalities: false,
+        localityValues: [],
+        carrier: "",
+      }),
   })
 );

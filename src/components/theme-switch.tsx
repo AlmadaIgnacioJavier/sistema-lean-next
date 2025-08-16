@@ -20,13 +20,7 @@ export function ThemeSwitch() {
   }, []);
 
   if (!mounted) {
-    return (
-      <div className="flex items-center space-x-2 opacity-0">
-        <Sun className="h-4 w-4" />
-        <Switch disabled />
-        <Moon className="h-4 w-4" />
-      </div>
-    );
+    return null;
   }
   return (
     <div className="flex items-center space-x-2 group">

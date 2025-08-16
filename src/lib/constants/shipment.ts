@@ -12,6 +12,6 @@ export type Rule = {
   shippingType: string; // value
   province: string; // value
   allLocalities: boolean;
-  localityValues: string[]; // option values
+  localityValues: Option[]; // option objects ({ value, label })
   carrier: string; // value
 };

@@ -3,16 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import useRouter from "@/lib/useRouter";
 import { usePathname } from "next/navigation";
-import {
-  Menu,
-  Home,
-  LogOut,
-  X,
-  CheckCircle,
-  Ban,
-  Truck,
-  Settings,
-} from "lucide-react";
+import { Menu, Home, X, CheckCircle, Ban, Truck, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -26,6 +17,7 @@ import {
 } from "@/components/ui/sheet";
 import { ThemeSwitch } from "@/components/theme-switch";
 import Spinner from "./ui/spinner";
+import NavbarSkeleton from "./skeleton/navbar";
 
 const menuItems = [
   {
@@ -56,6 +48,7 @@ const menuItems = [
 ];
 
 export function Navbar() {
+  const [isMounted, setIsMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   const [navLoading, setNavLoading] = useState(false);
@@ -66,31 +59,29 @@ export function Navbar() {
 
   const handleMenuItemClick = (href: string) => {
     setIsOpen(false);
-    // If already on the same path, do nothing
     if (href === pathname) return;
-    // Mark target and show skeleton while navigation happens
     targetRef.current = href;
     setNavLoading(true);
     router.push(href);
   };
 
   useEffect(() => {
-    // When pathname changes and matches the target, hide the skeleton
     if (navLoading && targetRef.current && pathname === targetRef.current) {
       setNavLoading(false);
       targetRef.current = null;
     }
-    // If navLoading was true but no target (edge), hide it
     if (navLoading && !targetRef.current) {
       setNavLoading(false);
     }
   }, [pathname, navLoading]);
 
-  const handleLogout = () => {
-    // Aquí puedes agregar la lógica de cerrar sesión
-    console.log("Cerrando sesión...");
-    setIsOpen(false);
-  };
+  useEffect(() => {
+    // Marca que el componente ya está montado en cliente
+    setIsMounted(true);
+  }, []);
+
+  // Mostrar skeleton hasta que el componente esté montado en cliente
+  if (!isMounted) return <NavbarSkeleton />;
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

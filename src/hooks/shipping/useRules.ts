@@ -50,7 +50,26 @@ export function useRules({ limitQuantity = 50 }: UseRulesProps = {}) {
           const data = doc.data() as any;
           const createdAt = parseDate(data?.createdAt);
 
-          items.push({ id: doc.id, ...data, createdAt } as unknown as Rule);
+          // Normalize localityValues: older records may store string[] (values only).
+          let localityValues: any = [];
+          if (Array.isArray(data?.localityValues)) {
+            if (data.localityValues.length === 0) localityValues = [];
+            else if (typeof data.localityValues[0] === "string") {
+              localityValues = data.localityValues.map((v: string) => ({
+                value: v,
+                label: v,
+              }));
+            } else {
+              localityValues = data.localityValues;
+            }
+          }
+
+          items.push({
+            id: doc.id,
+            ...data,
+            localityValues,
+            createdAt,
+          } as unknown as Rule);
         });
 
         setRules(items);

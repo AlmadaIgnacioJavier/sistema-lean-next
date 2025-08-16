@@ -26,26 +26,29 @@ export default function MultiSelect({
   disabled,
 }: {
   options: Option[];
-  selected: string[]; // option values
-  onChange: (values: string[]) => void;
+  selected: Option[]; // option objects
+  onChange: (values: Option[]) => void;
   placeholder?: string;
   disabled?: boolean;
 }) {
   const [open, setOpen] = React.useState(false);
-  const selectedSet = new Set(selected);
+  const selectedSet = new Set(selected.map((s) => s.value));
 
   const toggle = (value: string) => {
-    const set = new Set(selected);
-    if (set.has(value)) set.delete(value);
-    else set.add(value);
-    onChange(Array.from(set));
+    const exists = selectedSet.has(value);
+    let next: Option[];
+    if (exists) {
+      next = selected.filter((s) => s.value !== value);
+    } else {
+      const opt = options.find((o) => o.value === value);
+      next = opt ? [...selected, opt] : selected;
+    }
+    onChange(next);
   };
 
   const clearAll = () => onChange([]);
 
-  const selectedLabels = options
-    .filter((o) => selectedSet.has(o.value))
-    .map((o) => o.label);
+  const selectedLabels = selected.map((s) => s.label);
 
   return (
     <div className="w-full">

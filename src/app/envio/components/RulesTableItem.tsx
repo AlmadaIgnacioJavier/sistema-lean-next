@@ -19,6 +19,8 @@ const RulesTableItem: React.FC<RulesTableItemProps> = ({
   const { shippingTypes, provinces, localitiesByProvince, carriers } =
     useShippingStore();
 
+  console.log({ carriers });
+
   const { rules } = useRules();
   const rule = rules.find((r) => r.id === ruleId) as Rule | undefined;
   if (!rule) return null;
@@ -32,7 +34,9 @@ const RulesTableItem: React.FC<RulesTableItemProps> = ({
   const locs = rule.allLocalities
     ? "Todas las localidades"
     : (localitiesByProvince ?? [])
-        .filter((o) => rule.localityValues.includes(o.value))
+        .filter((o) =>
+          (rule.localityValues as any[]).some((lv) => lv.value === o.value)
+        )
         .map((o) => o.label)
         .join(", ");
 
