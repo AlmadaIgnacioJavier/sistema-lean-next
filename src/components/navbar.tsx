@@ -45,6 +45,11 @@ const menuItems = [
     label: "Configuración",
     href: "/configuracion",
   },
+  {
+    icon: Settings,
+    label: "Prioridad",
+    href: "/prioridad",
+  },
 ];
 
 export function Navbar() {

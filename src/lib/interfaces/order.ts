@@ -74,6 +74,7 @@ export interface Note {
   id: string;
   text: string;
   createdAt: Date;
+  color?: Colors; // Opcional, para soporte visual en NotesList
 }
 // Resultado de unión de /pedidos y /pedidos_estado para el frontend
 export interface PedidoUnificado extends Pedido, PedidoEstado {}
