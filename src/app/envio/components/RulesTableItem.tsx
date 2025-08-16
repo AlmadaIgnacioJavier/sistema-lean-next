@@ -33,12 +33,7 @@ const RulesTableItem: React.FC<RulesTableItemProps> = ({
     carriers.find((c) => c.value === rule.carrier)?.label ?? rule.carrier;
   const locs = rule.allLocalities
     ? "Todas las localidades"
-    : (localitiesByProvince ?? [])
-        .filter((o) =>
-          (rule.localityValues as any[]).some((lv) => lv.value === o.value)
-        )
-        .map((o) => o.label)
-        .join(", ");
+    : (rule.localityValues ?? []).map((o) => o.label).join(", ");
 
   return (
     <TableRow className="align-top">

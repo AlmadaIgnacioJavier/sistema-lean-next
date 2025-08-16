@@ -24,6 +24,8 @@ export interface Pedido {
     tipo: TipoEnvio;
     direccion: string;
     provincia: string;
+    localidad?: string;
+    codigoPostal?: string;
   };
   datosFacturacion?: {
     doc_type: TipoDocumento;
@@ -42,6 +44,7 @@ export interface PedidoEstado {
   tags: string[];
   alertas: Alert[];
   notas: Note[];
+  tagNote?: { value: string; color: Colors };
   logisticaAsignada: string;
   logisticaAsignadaManualmente: boolean;
   lastSyncedAt: string; // ISO date

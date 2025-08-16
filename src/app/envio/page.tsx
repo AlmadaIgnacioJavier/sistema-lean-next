@@ -18,7 +18,6 @@ const ShippingRulesPage = () => {
   const { logistics } = useLogistics();
 
   useEffect(() => {
-    console.log("Logistics data:", logistics);
     if (Array.isArray(logistics)) {
       const parseLogistics = logistics.map((item) => ({
         value: item.id,
