@@ -3,7 +3,16 @@
 import { useState, useEffect, useRef } from "react";
 import useRouter from "@/lib/useRouter";
 import { usePathname } from "next/navigation";
-import { Menu, Home, X, CheckCircle, Ban, Truck, Settings } from "lucide-react";
+import {
+  Menu,
+  Home,
+  X,
+  CheckCircle,
+  Ban,
+  Truck,
+  Settings,
+  Flag,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -46,7 +55,7 @@ const menuItems = [
     href: "/configuracion",
   },
   {
-    icon: Settings,
+    icon: Flag,
     label: "Prioridad",
     href: "/prioridad",
   },
